@@ -1,6 +1,5 @@
 # AI-ML Solutions in Azure Workshop
 ## by [Pariveda Solutions](parivedasolutions.com)
-
 ## [pariveda-ny-data-science](github.com/pariveda-ny-data-science) on GitHub
 
 [Presentation Link](https://docs.google.com/presentation/d/1zzXl2XUqYoE3YQ0_zjSJcc29d4peFQ27NPNlfYNOnHI/edit?usp=sharing)
@@ -10,7 +9,6 @@ The content of this workshop is derived from:
 * [Cog. Services Text Analytics Python Quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/quickstarts/python)
 * [Cog. Services Computer Vision Python Quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-analyze)
 * [Cog. Services Face API Python Quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/face/QuickStarts/Python)
-* Custom ML studio content
 
 In this workshop, we will:
 * Collect several thousand articles from Bing News about a brand of your choice
