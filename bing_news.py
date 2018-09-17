@@ -13,12 +13,14 @@ def search(query, count = 10, offset = 0):
         }
         params = { 
             'q': query, 
+            'sortBy': 'Date',
+            'originalImg': 'true',
             'count': count, 
             'offset': offset 
         }
         response = requests.get(url, headers = headers, params = params)
         response.raise_for_status()
         return response.json()
+
     except Exception as e:
         return None
-        
