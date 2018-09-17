@@ -1,6 +1,6 @@
 ## AI-ML Solutions in Azure Workshop
 
-by github.com/pariveda-ny-data-science
+by [Pariveda NY Data Science](github.com/pariveda-ny-data-science)
 
 ---
 
@@ -31,3 +31,8 @@ Implementation notes
 
 TODO
 * Convert individual Python scripts + this readme into Azure notebook to reduce setup time
+
+Other references
+* https://towardsdatascience.com/flattening-json-objects-in-python-f5343c794b10
+* https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html
+* 
