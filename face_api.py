@@ -13,13 +13,13 @@ def detect(image_url):
         }
         params = { 
             'returnFaceId': 'true',
-            'returnFaceLandmarks': 'false',
-            'returnFaceAttributes': 'age,gender,headPose,smile,facialHair,glasses'
+            'returnFaceLandmarks': 'true',
+            'returnFaceAttributes': 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise'
         }
         json = {
             'url': image_url
         }
-        response = requests.get(url, headers = headers, params = params, json = json)
+        response = requests.post(url, headers = headers, params = params, json = json)
         response.raise_for_status()
         return response.json()
 

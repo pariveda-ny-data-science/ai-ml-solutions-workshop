@@ -4,7 +4,7 @@ assert azure_keys.computer_vision
 base_url = 'https://southcentralus.api.cognitive.microsoft.com/vision/v2.0'
 key_header = 'Ocp-Apim-Subscription-Key'
 
-def analyze(url):
+def analyze(image_url):
 
     try:
         url = base_url + '/analyze'
@@ -12,12 +12,13 @@ def analyze(url):
             key_header: azure_keys.computer_vision
         }
         params = { 
-            'visualFeatures': 'Categories,Description,Color'
+            'visualFeatures': 'Categories,Tags,Description,Faces,ImageType,Color,Adult',
+            'details': 'Celebrities,Landmarks'
         }
         json = {
-            'url': url
+            'url': image_url
         }
-        response = requests.get(url, headers = headers, params = params, json = json)
+        response = requests.post(url, headers = headers, params = params, json = json)
         response.raise_for_status()
         return response.json()
 

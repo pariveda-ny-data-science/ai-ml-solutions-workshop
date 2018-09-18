@@ -2,3 +2,4 @@ __pycache__
 .vscode
 azure_keys.py
 *.csv
+*.json
