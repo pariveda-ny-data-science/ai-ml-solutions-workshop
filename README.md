@@ -1,6 +1,6 @@
 # AI-ML Solutions in Azure Workshop
-## by [Pariveda Solutions](parivedasolutions.com)
-## [pariveda-ny-data-science](github.com/pariveda-ny-data-science) on GitHub
+## by [Pariveda Solutions](http://parivedasolutions.com)
+## [pariveda-ny-data-science](http://github.com/pariveda-ny-data-science) on GitHub
 
 [Presentation Link](https://docs.google.com/presentation/d/1zzXl2XUqYoE3YQ0_zjSJcc29d4peFQ27NPNlfYNOnHI/edit?usp=sharing)
 
