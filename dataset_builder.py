@@ -1,7 +1,7 @@
 import bing_news, time, random, text_analytics, computer_vision, face_api
 
 NEWS_MAX_COUNT = 100
-MAX_API_ERRORS = 5
+MAX_API_ERRORS = 3
 TEXT_BATCH_SIZE = 1000
 
 def get_articles(brand, num_articles):
@@ -9,18 +9,19 @@ def get_articles(brand, num_articles):
     print('searching for "' + brand + '" news...')
     articles = []
     count = NEWS_MAX_COUNT
-    if num_articles < count:
-        count = num_articles
-    est_matches = count
+    est_matches = None
     errors = 0
-    while len(articles) < num_articles and len(articles) < est_matches:
+    while len(articles) < num_articles and (est_matches is None or len(articles) < est_matches):
+
+        if num_articles < count:
+            count = num_articles
 
         news = bing_news.search(brand, count, len(articles))
         
         try:
             assert news and news['totalEstimatedMatches'] and news['value']
 
-            if est_matches == NEWS_MAX_COUNT:
+            if est_matches is None:
                 est_matches = news['totalEstimatedMatches']
 
             for item in news['value']:
@@ -68,14 +69,17 @@ def add_image_analysis(articles):
                 article['image']['analysis'] = response
                 analyzed += 1
                 i += 1
+                errors = 0
                 print('.')
 
             except Exception:
                 errors += 1
                 print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
                 if errors >= MAX_API_ERRORS:
-                    print('hit max errors, stopping image analysis.')
-                    return articles
+                    print('hit max errors, skipping image.')
+                    i += 1
+                    errors = 0
+                    continue
                 seconds_to_wait = random.randint(1, 10)
                 print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
@@ -93,10 +97,10 @@ def add_image_faces(articles):
     i = 0
     analyzed = 0
     faces = 0
-    errors = 0
     while i < len(articles):
 
         article = articles[i]
+        errors = 0
 
         if 'image' in article and 'contentUrl' in article['image']:
             
@@ -114,8 +118,9 @@ def add_image_faces(articles):
                 errors += 1
                 print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
                 if errors >= MAX_API_ERRORS:
-                    print('hit max errors, stopping image face detection.')
-                    return articles
+                    print('hit max errors, skipping image.')
+                    i += 1
+                    continue
                 seconds_to_wait = random.randint(1, 10)
                 print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
@@ -154,7 +159,7 @@ def add_text_analysis(articles, endpoint, article_text_key, article_new_key, res
             assert len(documents) == len(batch)
 
             for j in range(0, len(documents)):
-                assert documents[j][response_key]
+                assert response_key in documents[j]
 
             for j in range(0, len(documents)):
                 batch[j][article_new_key] = documents[j][response_key]
