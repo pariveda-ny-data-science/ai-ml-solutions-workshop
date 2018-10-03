@@ -3,3 +3,4 @@ __pycache__
 azure_keys.py
 *.csv
 *.json
+.ipynb_checkpoints
