@@ -1,4 +1,4 @@
-import bing_news, time, random, text_analytics, computer_vision, face_api
+import bing_news, time, random, text_analytics, computer_vision, face_api, csv
 
 NEWS_MAX_COUNT = 100
 MAX_API_ERRORS = 3
@@ -80,7 +80,7 @@ def add_image_analysis(articles):
                     i += 1
                     errors = 0
                     continue
-                seconds_to_wait = random.randint(1, 10)
+                seconds_to_wait = 1
                 print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
 
@@ -121,7 +121,7 @@ def add_image_faces(articles):
                     print('hit max errors, skipping image.')
                     i += 1
                     continue
-                seconds_to_wait = random.randint(1, 10)
+                seconds_to_wait = 1
                 print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
 
@@ -180,4 +180,68 @@ def add_text_analysis(articles, endpoint, article_text_key, article_new_key, res
 
     return articles
 
-
+def flatten(brand, articles):
+    with open(brand.replace(' ', '-') + '.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        headers = ['headline', 'headlineSentiment', 'text', 'textKeyPhrases', 'textEntities', 'imageUrl']
+        headers.extend(['imageAdultScore', 'imageRacyScore', 'imageCategories', 'imageColors', 'imageCaptions'])
+        headers.extend(['imageTags', 'imageFaceCount', 'imageFaceAge'])
+        writer.writerow(headers)
+        for article in articles:
+            try:
+                row = []
+                row.append(article['name'])
+                row.append(str(article['headlineSentiment']))
+                row.append(article['description'])
+                key_phrases = ''
+                for i in range(0, len(article['textKeyPhrases'])):
+                    if i != 0:
+                        key_phrases += ','
+                    key_phrases += article['textKeyPhrases'][i]
+                row.append(key_phrases)
+                entities = ''
+                for i in range(0, len(article['textEntities'])):
+                    if i != 0:
+                        entities += ','
+                    entities += article['textEntities'][i]['name']
+                row.append(entities)
+                if 'image' in article:
+                    row.append(article['image']['contentUrl'])
+                    row.append(article['image']['analysis']['adult']['adultScore'])
+                    row.append(article['image']['analysis']['adult']['racyScore'])
+                    categories = ''
+                    for i in range(0, len(article['image']['analysis']['categories'])):
+                        if i != 0:
+                            categories += ','
+                        categories += article['image']['analysis']['categories'][i]['name']
+                    row.append(categories)
+                    colors = ''
+                    for i in range(0, len(article['image']['analysis']['color']['dominantColors'])):
+                        if i != 0:
+                            colors += ','
+                        colors += article['image']['analysis']['color']['dominantColors'][i]
+                    row.append(colors)
+                    captions = ''
+                    for i in range(0, len(article['image']['analysis']['description']['captions'])):
+                        if i != 0:
+                            captions += ','
+                        captions += article['image']['analysis']['description']['captions'][i]['text']
+                    row.append(captions)
+                    tags = ''
+                    for i in range(0, len(article['image']['analysis']['description']['tags'])):
+                        if i != 0:
+                            tags += ','
+                        tags += article['image']['analysis']['description']['tags'][i]
+                    row.append(tags)
+                    row.append(str(len(article['image']['faces'])))
+                    age = 0
+                    for i in range(0, len(article['image']['faces'])):
+                        age += article['image']['faces'][i]['faceAttributes']['age']
+                    age = age / len(article['image']['faces'])
+                    row.append(age)
+                else:
+                    for i in range(0, 9):
+                        row.append('')
+                writer.writerow(row)
+            except Exception:
+                continue
