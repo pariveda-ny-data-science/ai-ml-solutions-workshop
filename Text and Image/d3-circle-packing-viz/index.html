@@ -1,0 +1,42 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Text Entity Viz</title>
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+  <link rel="stylesheet" href="jquery.jsonview.min.css">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="jquery.jsonview.min.js"></script>
+</head>
+
+<body>
+  <!-- Example pack layout -->
+  <h1 class="title">Text Entity Relations with Sentiment Coloration</h1>
+  <div class="flex-container">
+    <svg width="600" height="600"></svg>
+    <div class="data-container">
+
+      <div class="data">
+        <input type="file" id="input" onchange="handleFiles(this.files)">
+        <div id="name">
+          <span class="primary">Group Name</span><span class="secondary"></span>
+        </div>
+        <div id="sentiment">
+          <span class="primary">Sentiment</span><span class="secondary"></span>
+        </div>
+        <div id="children">
+          <pre class="primary">Related Text Entities</pre><pre class="secondary"></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="data-display.js"></script>
+  <script src="data-prep.js"></script>
+  <script src="d3-packing.js"></script>
+</body>
+
+</html>
