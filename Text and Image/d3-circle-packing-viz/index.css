@@ -1,0 +1,105 @@
+body {
+    font-family: 'Segoe UI Light', 'Helvetica Light', Tahoma, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+  padding-left: 30px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    padding: 30px;
+}
+
+#faded-container > pre {
+    opacity: 0.55;
+}
+
+.data-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    max-height: 60vh;
+    overflow: hidden;
+}
+
+.data {
+  padding: 0 1em;
+  height: 100%;
+}
+
+.data div {
+  display: flex;
+  flex-direction: row;
+  align-content: space-around;
+}
+
+.data #name {
+  font-size: 2em;
+  font-variant: small-caps;
+}
+
+.data #sentiment {
+  font-size: 1.5em;
+}
+
+.primary {
+  flex: 1;
+}
+
+.secondary {
+  opacity: 0.45;
+  flex: 1;
+}
+
+#children .primary, #children .secondary {
+  display: inline-block;
+  overflow-y: scroll;
+  max-height: 70%;
+}
+
+.node {
+    cursor: pointer;
+    stroke-width: 0.75px;
+    stroke: rgba(0,0,0,0.1);
+    transition: stroke 250ms, stroke-width 250ms;
+    transition-timing-function: ease-in-out;
+}
+
+.node:hover {
+    stroke: rgba(0,0,0,0.8);
+    stroke-width: 2px;
+    transition: stroke 250ms, stroke-width 250ms;
+    transition-timing-function: ease-in-out;
+}
+
+.label {
+    text-anchor: left;
+    fill: black;
+    /* text-shadow: 0 0.05em 0 #fff, 0.05em 0 0 #fff, -0.05em 0 0 #fff, 0 -0.05em 0 #fff; */
+}
+
+.label,
+.node--root,
+.node--leaf {
+    pointer-events: none;
+}
+
+path {
+    fill: none;
+    /* stroke: black;
+    stroke-width: 1px; */
+}
+
+/* #output {
+    overflow: scroll;
+    background: lightgray;
+    color: #333333;
+    padding: 2em;
+    height: 30vh;
+} */
