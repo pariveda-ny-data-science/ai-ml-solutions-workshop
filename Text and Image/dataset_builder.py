@@ -6,6 +6,8 @@ TEXT_BATCH_SIZE = 1000
 
 def get_articles(brand, num_articles):
 
+    assert brand != ''
+
     print('searching for "' + brand + '" news...')
     articles = []
     count = NEWS_MAX_COUNT
@@ -74,14 +76,14 @@ def add_image_analysis(articles):
 
             except Exception:
                 errors += 1
-                print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
+                # print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
                 if errors >= MAX_API_ERRORS:
                     print('hit max errors, skipping image.')
                     i += 1
                     errors = 0
                     continue
                 seconds_to_wait = 1
-                print('waiting ' + str(seconds_to_wait) + ' seconds...')
+                # print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
 
         else:
@@ -116,13 +118,13 @@ def add_image_faces(articles):
 
             except Exception:
                 errors += 1
-                print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
+                # print('error occured. (' + str(errors) + ' of ' + str(MAX_API_ERRORS) + ' allowed.)')
                 if errors >= MAX_API_ERRORS:
                     print('hit max errors, skipping image.')
                     i += 1
                     continue
                 seconds_to_wait = 1
-                print('waiting ' + str(seconds_to_wait) + ' seconds...')
+                # print('waiting ' + str(seconds_to_wait) + ' seconds...')
                 time.sleep(seconds_to_wait)
 
         else:
