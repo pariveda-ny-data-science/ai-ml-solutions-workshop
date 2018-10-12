@@ -72,7 +72,8 @@ def add_image_analysis(articles):
                 analyzed += 1
                 i += 1
                 errors = 0
-                print('.')
+                print('image analyzed. waiting 3 seconds...')
+                time.sleep(3)
 
             except Exception:
                 errors += 1

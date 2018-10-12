@@ -1,4 +1,4 @@
-import dataset_builder, json
+import dataset_builder, json, computer_vision
 
 brand = 'exxon'
 
