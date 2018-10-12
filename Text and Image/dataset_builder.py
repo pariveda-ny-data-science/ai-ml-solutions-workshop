@@ -1,4 +1,4 @@
-import bing_news, time, random, text_analytics, computer_vision, face_api, csv
+import bing_news, time, random, text_analytics, computer_vision, face_api, os, json, csv
 
 NEWS_MAX_COUNT = 100
 MAX_API_ERRORS = 3
@@ -41,7 +41,7 @@ def get_articles(brand, num_articles):
             print('waiting ' + str(seconds_to_wait) + ' seconds...')
             time.sleep(seconds_to_wait)
 
-    return articles
+    return articles[:num_articles]
 
 def add_headline_sentiments(articles):
     return add_text_analysis(articles, 'sentiment', 'name', 'headlineSentiment', 'score')
@@ -65,6 +65,7 @@ def add_image_analysis(articles):
         if 'image' in article and 'contentUrl' in article['image']:
             
             response = computer_vision.analyze(article['image']['contentUrl'])
+            # time.sleep(3)
 
             try:
                 assert response and type(response) is dict
@@ -72,8 +73,7 @@ def add_image_analysis(articles):
                 analyzed += 1
                 i += 1
                 errors = 0
-                print('image analyzed. waiting 3 seconds...')
-                time.sleep(3)
+                print('image analyzed.')
 
             except Exception:
                 errors += 1
@@ -107,6 +107,7 @@ def add_image_faces(articles):
         if 'image' in article and 'contentUrl' in article['image']:
             
             response = face_api.detect(article['image']['contentUrl'])
+            # time.sleep(3)
 
             try:
                 assert type(response) is list
@@ -114,8 +115,7 @@ def add_image_faces(articles):
                 analyzed += 1
                 faces += len(response)
                 i += 1
-                print('image analyzed. waiting 3 seconds...')
-                time.sleep(3)
+                print('image analyzed.')
 
             except Exception:
                 errors += 1
@@ -183,68 +183,215 @@ def add_text_analysis(articles, endpoint, article_text_key, article_new_key, res
 
     return articles
 
+def dump(brand, articles):
+
+    brand_folder = os.getcwd() + '/output/' + brand.lower().replace(' ', '-')
+    if not os.path.exists(brand_folder):
+        os.makedirs(brand_folder)
+
+    with open(brand_folder + '/articles.json', 'w') as json_file:
+        json.dump(articles, json_file, indent = 4, sort_keys = True)
+
 def flatten(brand, articles):
-    with open(brand.replace(' ', '-') + '.csv', 'w', newline = '') as file:
+
+    brand_folder = os.getcwd() + '/output/' + brand.lower().replace(' ', '-')
+    if not os.path.exists(brand_folder):
+        os.makedirs(brand_folder)
+
+    csv_articles = []
+    csv_articles.append(['articleLink', 'headline', 'headlineSentiment', 'textSnippet'])
+
+    entities = []
+    entities.append(['articleLink', 'entity', 'wikiLink'])
+
+    key_phrases = []
+    key_phrases.append(['articleLink', 'phrase'])
+
+    images = []
+    images_header = ['articleLink', 'imageLink', 'adultScore', 'isRacyContent', 'isAdultContent', 'racyScore']
+    images_header.extend(['accentColor', 'dominantColorBackground', 'dominantColorForeground', 'isBwImg'])
+    images_header.extend(['clipArtType', 'lineDrawingType', 'format', 'height', 'width'])
+    images.append(images_header)
+
+    image_categories = []
+    image_categories.append(['articleLink', 'imageLink', 'category', 'score'])
+
+    image_colors = []
+    image_colors.append(['articleLink', 'imageLink', 'color'])
+
+    image_desc_tags = []
+    image_desc_tags.append(['articleLink', 'imageLink', 'tag'])
+
+    image_desc_captions = []
+    image_desc_captions.append(['articleLink', 'imageLink', 'caption', 'confidence'])
+
+    image_tags = []
+    image_tags.append(['articleLink', 'imageLink', 'tag', 'confidence'])
+
+    image_faces = []
+    faces_header = ['articleLink', 'imageLink', 'accessories', 'age', 'anger', 'contempt', 'disgust']
+    faces_header.extend(['fear', 'happiness', 'neutral', 'sadness', 'surprise', 'beard', 'mustache', 'sideburns'])
+    faces_header.extend(['gender', 'glasses', 'bald', 'hairColor', 'makeup', 'smile'])
+    image_faces.append(faces_header)
+
+    for article in articles:
+
+        try:
+            csv_articles.append([article['url'], article['name'], article['headlineSentiment'], article['description']])
+        except Exception:
+            pass
+
+        try:
+            for entity in article['textEntities']:
+                entities.append([article['url'], entity['name'], entity['wikipediaUrl']])
+        except Exception:
+            pass
+
+        try:
+            for phrase in article['textKeyPhrases']:
+                key_phrases.append([article['url'], phrase])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            adult = image['analysis']['adult']
+            color = image['analysis']['color']
+            imageType = image['analysis']['imageType']
+            metadata = image['analysis']['metadata']
+            row = [article['url'], image['contentUrl'], adult['adultScore'], adult['isRacyContent'], adult['isAdultContent'], adult['racyScore']]
+            row.extend([color['accentColor'], color['dominantColorBackground'], color['dominantColorForeground'], color['isBwImg']])
+            row.extend([imageType['clipArtType'], imageType['lineDrawingType'], metadata['format'], metadata['height'], metadata['width']])
+            images.append(row)
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            for category in image['analysis']['categories']:
+                image_categories.append([article['url'], image['contentUrl'], category['name'], category['score']])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            for color in image['analysis']['color']['dominantColors']:
+                image_colors.append([article['url'], image['contentUrl'], color])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            description = image['analysis']['description']
+            for tag in description['tags']:
+                image_desc_tags.append([article['url'], image['contentUrl'], tag])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            description = image['analysis']['description']
+            for caption in description['captions']:
+                image_desc_captions.append([article['url'], image['contentUrl'], caption['text'], caption['confidence']])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            tags = image['analysis']['tags']
+            for tag in tags:
+                image_tags.append([article['url'], image['contentUrl'], tag['name'], tag['confidence']])
+        except Exception:
+            pass
+
+        try:
+            image = article['image']
+            for face in image['faces']:
+                faceAttributes = face['faceAttributes']
+                emotion = faceAttributes['emotion']
+                facialHair = faceAttributes['facialHair']
+                hair = faceAttributes['hair']
+                makeup = faceAttributes['makeup']
+                row = [article['url'], image['contentUrl'], len(faceAttributes['accessories']) > 0, faceAttributes['age'], emotion['anger'], emotion['contempt'], emotion['disgust']]
+                row.extend([emotion['fear'], emotion['happiness'], emotion['neutral'], emotion['sadness'], emotion['surprise'], facialHair['beard'], facialHair['moustache'], facialHair['sideburns']])
+                row.extend([faceAttributes['gender'], faceAttributes['glasses'], hair['bald'], hair['hairColor'][0]['color'], makeup['eyeMakeup'] or makeup['lipMakeup'], faceAttributes['smile']])
+                image_faces.append(row)
+        except Exception:
+            pass
+
+    with open(brand_folder + '/articles.csv', 'w', newline = '') as file:
         writer = csv.writer(file, delimiter = ',')
-        headers = ['headline', 'headlineSentiment', 'text', 'textKeyPhrases', 'textEntities', 'imageUrl']
-        headers.extend(['imageAdultScore', 'imageRacyScore', 'imageCategories', 'imageColors', 'imageCaptions'])
-        headers.extend(['imageTags', 'imageFaceCount', 'imageFaceAge'])
-        writer.writerow(headers)
-        for article in articles:
+        for row in csv_articles:
             try:
-                row = []
-                row.append(article['name'])
-                row.append(str(article['headlineSentiment']))
-                row.append(article['description'])
-                key_phrases = ''
-                for i in range(0, len(article['textKeyPhrases'])):
-                    if i != 0:
-                        key_phrases += ','
-                    key_phrases += article['textKeyPhrases'][i]
-                row.append(key_phrases)
-                entities = ''
-                for i in range(0, len(article['textEntities'])):
-                    if i != 0:
-                        entities += ','
-                    entities += article['textEntities'][i]['name']
-                row.append(entities)
-                if 'image' in article:
-                    row.append(article['image']['contentUrl'])
-                    row.append(article['image']['analysis']['adult']['adultScore'])
-                    row.append(article['image']['analysis']['adult']['racyScore'])
-                    categories = ''
-                    for i in range(0, len(article['image']['analysis']['categories'])):
-                        if i != 0:
-                            categories += ','
-                        categories += article['image']['analysis']['categories'][i]['name']
-                    row.append(categories)
-                    colors = ''
-                    for i in range(0, len(article['image']['analysis']['color']['dominantColors'])):
-                        if i != 0:
-                            colors += ','
-                        colors += article['image']['analysis']['color']['dominantColors'][i]
-                    row.append(colors)
-                    captions = ''
-                    for i in range(0, len(article['image']['analysis']['description']['captions'])):
-                        if i != 0:
-                            captions += ','
-                        captions += article['image']['analysis']['description']['captions'][i]['text']
-                    row.append(captions)
-                    tags = ''
-                    for i in range(0, len(article['image']['analysis']['description']['tags'])):
-                        if i != 0:
-                            tags += ','
-                        tags += article['image']['analysis']['description']['tags'][i]
-                    row.append(tags)
-                    row.append(str(len(article['image']['faces'])))
-                    age = 0
-                    for i in range(0, len(article['image']['faces'])):
-                        age += article['image']['faces'][i]['faceAttributes']['age']
-                    age = age / len(article['image']['faces'])
-                    row.append(age)
-                else:
-                    for i in range(0, 9):
-                        row.append('')
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/entities.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in entities:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/key-phrases.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in key_phrases:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/images.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in images:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/image-categories.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_categories:
+            writer.writerow(category)
+
+    with open(brand_folder + '/image-colors.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_colors:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/image-desc-tags.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_desc_tags:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/image-desc-captions.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_desc_captions:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/image-tags.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_tags:
+            try:
+                writer.writerow(row)
+            except Exception:
+                continue
+
+    with open(brand_folder + '/image-faces.csv', 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ',')
+        for row in image_faces:
+            try:
                 writer.writerow(row)
             except Exception:
                 continue
