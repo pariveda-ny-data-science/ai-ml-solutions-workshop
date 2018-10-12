@@ -81,7 +81,6 @@ def add_image_analysis(articles):
                 if errors >= MAX_API_ERRORS:
                     print('hit max errors, skipping image.')
                     i += 1
-                    errors = 0
                     continue
                 seconds_to_wait = 1
                 # print('waiting ' + str(seconds_to_wait) + ' seconds...')
@@ -115,7 +114,8 @@ def add_image_faces(articles):
                 analyzed += 1
                 faces += len(response)
                 i += 1
-                print('.')
+                print('image analyzed. waiting 3 seconds...')
+                time.sleep(3)
 
             except Exception:
                 errors += 1
