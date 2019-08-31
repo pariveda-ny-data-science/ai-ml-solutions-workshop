@@ -2,7 +2,8 @@
 ## by [Pariveda Solutions](http://parivedasolutions.com)
 ## [pariveda-ny-data-science](http://github.com/pariveda-ny-data-science) on GitHub
 
-[Presentation Link](https://docs.google.com/presentation/d/1zzXl2XUqYoE3YQ0_zjSJcc29d4peFQ27NPNlfYNOnHI/edit?usp=sharing)
+[Presentation Link](https://parivedasolutions.box.com/s/notjt6snss0uo94hlrxk48qj7mp7uddl)
+[Custom Visualizaiton](https://thuynh02.github.io/viz-demo/)
 
 The content of this workshop is derived from:
 * [Bing News API Python Quickstart](https://docs.microsoft.com/en-us/azure/cognitive-services/bing-news-search/python)
